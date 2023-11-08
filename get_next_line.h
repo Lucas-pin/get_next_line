@@ -6,7 +6,7 @@
 /*   By: lpin <lpin@student.42.malaga.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 21:44:53 by lpin              #+#    #+#             */
-/*   Updated: 2023/11/03 22:42:01 by lpin             ###   ########.fr       */
+/*   Updated: 2023/11/08 19:16:51 by lpin             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,19 +22,21 @@ typedef struct s_body
 {
 	int				fd;
 	unsigned int	content_size;
-	unsigned int	offset;
+	int				offset;
 	char			*content;
 	char			*ret;
 }					t_body;
 
 int				ft_searcher(const char *haystack);
 
-void			ft_init(t_body **body);
+void			ft_init(t_body *body);
 
 unsigned int	ft_strlen(const char *s);
 
 unsigned int	ft_strlcat(char *dst, const char *src, unsigned int dstsize);
 
 void			ft_destroyer(char *to_destroy);
+
+char			*ft_put_forward(char *src, int len);
 
 #endif

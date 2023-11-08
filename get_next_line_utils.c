@@ -6,7 +6,7 @@
 /*   By: lpin <lpin@student.42.malaga.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 21:40:50 by lpin              #+#    #+#             */
-/*   Updated: 2023/11/03 22:42:16 by lpin             ###   ########.fr       */
+/*   Updated: 2023/11/08 17:31:11 by lpin             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,22 +21,22 @@ int	ft_searcher(const char *haystack)
 	temp = (char *)haystack;
 	if (!haystack)
 		return (0);
-	while (*temp && *temp == '\n')
+	while (*temp && *temp != '\n')
 	{
 		++offset;
 		temp++;
 	}
 	if (*temp == '\n')
-		return (offset);
+		return (offset + 1);
 	else
 		return (-1);
 }
 
-void	ft_init(t_body **body)
+void	ft_init(t_body *body)
 {
-	(*body)->fd = 0;
-	(*body)->content_size = 0;
-	(*body)->offset = 0;
+	body->fd = 0;
+	body->content_size = 0;
+	body->offset = 0;
 }
 
 unsigned int	ft_strlen(const char *s)
