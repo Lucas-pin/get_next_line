@@ -6,7 +6,7 @@
 /*   By: lpin <lpin@student.42.malaga.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 21:40:50 by lpin              #+#    #+#             */
-/*   Updated: 2023/11/08 17:31:11 by lpin             ###   ########.fr       */
+/*   Updated: 2023/11/14 11:12:30 by lpin             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,8 @@ unsigned int	ft_strlen(const char *s)
 	unsigned int	len;
 
 	len = 0;
+	if (s == NULL)
+		return (0);
 	while (s[len])
 		len++;
 	return (len);
@@ -60,6 +62,8 @@ unsigned int	ft_strlcat(char *dst, const char *src, unsigned int dstsize)
 	src_len = ft_strlen(src);
 	i = 0;
 	j = 0;
+	if (src == NULL || dstsize == 0)
+		return (0);
 	if (dstsize > 0 && dst_len < dstsize)
 	{
 		while (dst[i] != '\0')
