@@ -3,20 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.h                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpin <lpin@student.42.malaga.com>          +#+  +:+       +#+        */
+/*   By: lpin < lpin@student.42malaga.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 21:44:53 by lpin              #+#    #+#             */
-/*   Updated: 2023/11/14 13:45:42 by lpin             ###   ########.fr       */
+/*   Updated: 2023/11/16 11:51:23 by lpin             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
 # include <stdio.h>
+# include <stdlib.h>
 # include <ctype.h>
 # include <string.h>
-# include <stdlib.h>
 # include <unistd.h>
+# include <stddef.h>
+# include <fcntl.h>
+
 
 typedef struct s_body
 {
@@ -38,6 +41,6 @@ unsigned int	ft_strlcat(char *dst, const char *src, unsigned int dstsize);
 
 void			ft_destroyer(char *to_destroy);
 
-char			*ft_put_forward(char *src, char *dst, int len);
+char			*ft_put_forward(char *src, int len);
 
 #endif
