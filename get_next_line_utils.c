@@ -6,7 +6,7 @@
 /*   By: lpin < lpin@student.42malaga.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 21:40:50 by lpin              #+#    #+#             */
-/*   Updated: 2023/11/16 11:54:13 by lpin             ###   ########.fr       */
+/*   Updated: 2023/11/16 16:57:45 by lpin             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,12 +82,15 @@ unsigned int	ft_strlcat(char *dst, const char *src, unsigned int dstsize)
 
 void	ft_destroyer(char *to_destroy)
 {
-	if (!to_destroy)
+	char	*temp;
+
+	temp = to_destroy;
+	if (!temp)
 		return ;
-	while (*to_destroy)
+	while (*temp)
 	{
-		*to_destroy = '\0';
-		to_destroy++;
+		*temp = '\0';
+		temp++;
 	}
 	free(to_destroy);
 }
