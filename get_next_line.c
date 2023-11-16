@@ -6,7 +6,7 @@
 /*   By: lpin < lpin@student.42malaga.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 22:05:06 by lpin              #+#    #+#             */
-/*   Updated: 2023/11/16 11:54:16 by lpin             ###   ########.fr       */
+/*   Updated: 2023/11/16 16:59:14 by lpin             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,35 @@ char	*ft_put_forward(char *src, int len)
 	return (temp);
 }
 
+void	ft_resize(t_body *body, char *buffer)
+{
+	char	*temp;
+
+	if (!body || !buffer)
+		return ;
+	body->content_size = ft_strlen(body->content);
+	temp = malloc(body->content_size + 1);
+	if (temp == NULL)
+	{
+		ft_destroyer(temp);
+		ft_destroyer(body->content);
+		return ;
+	}
+	ft_strlcat(temp, body->content, (body->content_size + 1));
+	ft_destroyer(body->content);
+	body->content = malloc(body->content_size + body->buffer_size + 1);
+	if (body->content == NULL)
+	{
+		ft_destroyer(body->content);
+		return ;
+	}
+	ft_strlcat(body->content, temp, \
+	(body->content_size + body->buffer_size + 1));
+	ft_strlcat(body->content, buffer, \
+					(body->content_size + body->buffer_size + 1));
+	ft_destroyer(temp);
+}
+
 void	ft_read(t_body *body, char *buffer)
 {
 	if (body->content == NULL)
@@ -45,17 +74,44 @@ void	ft_read(t_body *body, char *buffer)
 			ft_destroyer(body->content);
 			return ;
 		}
+		ft_strlcat(body->content, buffer, (body->buffer_size + 1));
 	}
-	ft_strlcat(body->content, buffer, (body->buffer_size + 1));
+	else
+		ft_resize(body, buffer);
+}
+
+void	ft_last_read(t_body *body)
+{
+	if (ft_searcher(body->content) == -1)
+	{
+		body->ret = malloc (ft_strlen(body->content) + 2);
+		ft_strlcat(body->ret, body->content, (ft_strlen(body->content) + 2));
+		ft_strlcat(body->ret, "\n", (ft_strlen(body->content) + 2));
+		ft_destroyer(body->content);
+		body->content = NULL;
+	}
+	if (ft_searcher(body->content) > 0)
+	{
+		body->ret = malloc (ft_strlen(body->content) + 1);
+		ft_strlcat(body->ret, body->content, (ft_strlen(body->content) + 1));
+		ft_destroyer(body->content);
+		body->content = NULL;
+	}
 }
 
 char	*get_next_line(int fd)
 {
 	static t_body	body = {0, 0, 0, 0, NULL, NULL};
-	char			buffer[18];
+	char			buffer[50];
 	int				i;
+	int				searcher_flag;
+	int				read_flag;
 
-	while (ft_searcher(body.content) <= 0)
+	searcher_flag = 0;
+	body.fd = fd;
+	ft_destroyer(body.ret);
+	body.ret = NULL;
+	while (searcher_flag <= 0)
 	{
 		i = sizeof(buffer);
 		while (i >= 0)
@@ -63,18 +119,32 @@ char	*get_next_line(int fd)
 			buffer[i] = '\0';
 			--i;
 		}
-		if (read(fd, buffer, sizeof(buffer)) == -1)
+		read_flag = read(body.fd, buffer, sizeof(buffer));
+		if (read_flag == -1)
+		{
+			ft_destroyer(body.content);
+			ft_destroyer(body.ret);
+			body.content = NULL;
+			body.ret = NULL;
 			return (NULL);
+		}
+		else if (read_flag == 0)
+			break ;
 		if (ft_strlen(buffer) > sizeof(buffer))
 			body.buffer_size = sizeof(buffer);
 		else
 			body.buffer_size = ft_strlen(buffer);
 		ft_read(&body, buffer);
+		searcher_flag = ft_searcher(body.content);
 	}
-	body.ret = malloc (ft_searcher(body.content) + 1);
-	ft_strlcat(body.ret, body.content, ft_searcher(body.content) + 1);
-	ft_put_forward(body.content, ft_searcher(body.content));
-	printf("El body.content es: %s", body.content);
+	if (read_flag == 0)
+		ft_last_read(&body);
+	else
+	{
+		body.ret = malloc (ft_searcher(body.content) + 1);
+		ft_strlcat(body.ret, body.content, ft_searcher(body.content) + 1);
+		ft_put_forward(body.content, ft_searcher(body.content));
+	}
 	return (body.ret);
 }
 
@@ -86,5 +156,14 @@ int	main(void)
 	fd = open("prueba.txt", O_RDONLY);
 	ret = get_next_line(fd);
 	printf("El ret es: %s", ret);
+	ret = get_next_line(fd);
+	printf("El ret es: %s", ret);
+	ret = get_next_line(fd);
+	printf("El ret es: %s", ret);
+	ret = get_next_line(fd);
+	printf("El ret es: %s", ret);
+	ret = get_next_line(fd);
+	printf("El ret es: %s\n", ret);
+	close(fd);
 	return (0);
 }
