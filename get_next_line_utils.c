@@ -6,7 +6,7 @@
 /*   By: lpin < lpin@student.42malaga.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 21:40:50 by lpin              #+#    #+#             */
-/*   Updated: 2023/11/16 16:57:45 by lpin             ###   ########.fr       */
+/*   Updated: 2023/11/17 13:47:00 by lpin             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,17 +80,18 @@ unsigned int	ft_strlcat(char *dst, const char *src, unsigned int dstsize)
 	return (src_len + dstsize);
 }
 
-void	ft_destroyer(char *to_destroy)
+void	*ft_destroyer(char *to_destroy)
 {
 	char	*temp;
 
 	temp = to_destroy;
 	if (!temp)
-		return ;
+		return (NULL);
 	while (*temp)
 	{
 		*temp = '\0';
 		temp++;
 	}
 	free(to_destroy);
+	return (NULL);
 }

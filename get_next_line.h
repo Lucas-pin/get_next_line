@@ -6,7 +6,7 @@
 /*   By: lpin < lpin@student.42malaga.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 21:44:53 by lpin              #+#    #+#             */
-/*   Updated: 2023/11/16 11:51:23 by lpin             ###   ########.fr       */
+/*   Updated: 2023/11/17 13:47:03 by lpin             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@
 # include <unistd.h>
 # include <stddef.h>
 # include <fcntl.h>
-
 
 typedef struct s_body
 {
@@ -39,8 +38,10 @@ unsigned int	ft_strlen(const char *s);
 
 unsigned int	ft_strlcat(char *dst, const char *src, unsigned int dstsize);
 
-void			ft_destroyer(char *to_destroy);
+void			*ft_destroyer(char *to_destroy);
 
 char			*ft_put_forward(char *src, int len);
+
+char			*get_next_line(int fd);
 
 #endif
