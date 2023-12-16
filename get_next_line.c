@@ -3,184 +3,125 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lpin < lpin@student.42malaga.com>          +#+  +:+       +#+        */
+/*   By: lpin <lpin@student.42.malaga.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 22:05:06 by lpin              #+#    #+#             */
-/*   Updated: 2023/11/17 13:46:53 by lpin             ###   ########.fr       */
+/*   Updated: 2023/12/16 18:21:22 by lpin             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #ifndef BUFFER_SIZE
-# define BUFFER_SIZE 1
+# define BUFFER_SIZE 10
 #endif
 
-char	*ft_put_forward(char *src, int len)
+int	ft_read(t_body *body, char *buffer)
 {
-	int		i;
-	char	*temp;
-
-	i = ft_strlen(src);
-	temp = src;
-	if (!src || len == 0 || len == -1)
-		return (src);
-	while (i >= len)
+	body->read_size = 1;
+	body->offset = 0;
+	while (body->offset == 0 && body->read_size > 0)
 	{
-		*src = *(src + len);
-		--i;
-		src++;
+		buffer[BUFFER_SIZE] = '\0';
+		body->read_size = read(body->fd, buffer, BUFFER_SIZE);
+		if (body->read_size > 0)
+			ft_save_content(body, buffer);
+		body->offset = ft_searcher(body->content);
 	}
-	while (*src)
-	{
-		*src = '\0';
-		src++;
-	}
-	return (temp);
+	if (body->read_size == 0 && body->offset == -1)
+		return (1);
+	else if (body->read_size == -1)
+		return (-1);
+	else
+		return (0);
 }
 
 void	ft_resize(t_body *body, char *buffer)
 {
 	char	*temp;
 
-	if (!body || !buffer)
-		return ;
-	body->content_size = ft_strlen(body->content);
-	temp = malloc(body->content_size + 1);
+	body->content_size = ft_strlen(body->content, -1) + body->read_size;
+	temp = malloc(sizeof(char) * (ft_strlen(body->content, -1) + 1));
 	if (temp == NULL)
-	{
-		ft_destroyer(temp);
 		return ;
-	}
-	ft_strlcat(temp, body->content, (body->content_size + 1));
-	ft_destroyer(body->content);
-	body->content = malloc(body->content_size + body->buffer_size + 1);
+	ft_strlen(temp, ft_strlen(body->content, -1));
+	ft_strlcat(temp, body->content, (ft_strlen(body->content, -1) + 1));
+	ft_destroyer(&body->content);
+	body->content = malloc(sizeof(char) * (body->content_size + 1));
 	if (body->content == NULL)
-	{
-		ft_destroyer(body->content);
 		return ;
-	}
-	ft_strlcat(body->content, temp, \
-	(body->content_size + body->buffer_size + 1));
-	ft_strlcat(body->content, buffer, \
-					(body->content_size + body->buffer_size + 1));
-	ft_destroyer(temp);
+	ft_strlen(body->content, body->content_size);
+	ft_strlcat(body->content, temp, ft_strlen(temp, -1) + 1);
+	ft_strlcat(body->content, buffer, body->content_size + 1);
+	ft_destroyer(&temp);
 }
 
-void	ft_read(t_body *body, char *buffer)
+void	ft_save_ret(t_body *body)
 {
 	if (body->content == NULL)
 	{
-		body->content = malloc((sizeof(char) * (body->buffer_size + 1)));
-		if (body->content == NULL)
-		{
-			ft_destroyer(body->content);
+		body->ret = NULL;
+		return ;
+	}
+	if (body->offset == 0)
+	{
+		body->ret = malloc (sizeof(char) * ft_strlen(body->content, -1) + 1);
+		if (body->ret == NULL)
 			return ;
-		}
-		ft_strlcat(body->content, buffer, (body->buffer_size + 1));
+		ft_strlen(body->ret, ft_strlen(body->content, -1));
+		ft_strlcat(body->ret, body->content,
+			(ft_strlen(body->content, -1) + 1));
+		ft_put_forward(body->content, (ft_strlen(body->content, -1) + 1));
+	}
+	else if (body->offset != 0)
+	{
+		body->ret = malloc (sizeof(char) * body->offset + 1);
+		if (body->ret == NULL)
+			return ;
+		ft_strlen(body->ret, body->offset);
+		ft_strlcat(body->ret, body->content, (body->offset + 1));
+		ft_put_forward(body->content, body->offset);
+	}
+	body->offset = ft_searcher(body->content);
+}
+
+void	ft_save_content(t_body *body, char *buffer)
+{
+	if (*buffer == '\0')
+		return ;
+	if (body->content == NULL)
+	{
+		body->content = malloc((body->read_size + 1));
+		if (body->content == NULL)
+			return ;
+		ft_strlen(body->content, body->read_size);
+		ft_strlcat(body->content, buffer, (body->read_size + 1));
 	}
 	else
 		ft_resize(body, buffer);
 }
 
-void	ft_last_read(t_body *body)
-{
-	if (ft_searcher(body->content) == -1)
-	{
-		body->ret = malloc (ft_strlen(body->content) + 2);
-		if (body->ret == NULL)
-		{
-			ft_destroyer(body->ret);
-			return ;
-		}
-		ft_strlcat(body->ret, body->content, (ft_strlen(body->content) + 2));
-		ft_strlcat(body->ret, "\n", (ft_strlen(body->content) + 2));
-		ft_destroyer(body->content);
-		body->content = NULL;
-	}
-	if (ft_searcher(body->content) > 0)
-	{
-		body->ret = malloc (ft_searcher(body->content) + 1);
-		if (body->ret == NULL)
-		{
-			ft_destroyer(body->ret);
-			return ;
-		}
-		ft_strlcat(body->ret, body->content, (ft_searcher(body->content) + 1));
-		if (ft_searcher(body->content) == 0)
-		{
-			ft_destroyer(body->content);
-			body->content = NULL;
-		}
-		else
-			ft_put_forward(body->content, ft_searcher(body->content));
-	}
-}
-
 char	*get_next_line(int fd)
 {
 	static t_body	body = {0, 0, 0, 0, NULL, NULL};
-	char			buffer[BUFFER_SIZE];
-	int				i;
-	int				searcher_flag;
-	int				read_flag;
+	char			buffer[BUFFER_SIZE + 1];
+	int				read_ret;
 
-	searcher_flag = 0;
-	body.fd = fd;
-	if (body.fd == -1)
-	{
-		ft_destroyer(body.content);
-		ft_destroyer(body.ret);
-		body.content = NULL;
-		body.ret = NULL;
+	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	}
-	while (searcher_flag <= 0)
+	body.fd = fd;
+	read_ret = 0;
+	ft_strlen(buffer, BUFFER_SIZE);
+	if (ft_searcher(body.content) <= 0)
+		read_ret = ft_read(&body, buffer);
+	if (read_ret == 0)
 	{
-		i = sizeof(buffer);
-		while (i >= 0)
-		{
-			buffer[i] = '\0';
-			--i;
-		}
-		read_flag = read(body.fd, buffer, sizeof(buffer));
-		if (read_flag == -1)
-		{
-			ft_destroyer(body.content);
-			ft_destroyer(body.ret);
-			body.content = NULL;
-			body.ret = NULL;
-			return (NULL);
-		}
-		else if (read_flag == 0)
-			break ;
-		body.buffer_size = ft_strlen(buffer);
-		ft_read(&body, buffer);
-		searcher_flag = ft_searcher(body.content);
+		ft_save_ret(&body);
+		if (ft_strlen(body.content, -1) == 0)
+			ft_destroyer(&body.content);
 	}
-	if (read_flag == 0)
-		ft_last_read(&body);
-	else
-	{
-		body.ret = malloc (ft_searcher(body.content) + 1);
-		if (body.ret == NULL)
-			return (ft_destroyer(body.ret));
-		if (body.fd == -1)
-		{
-			ft_destroyer(body.content);
-			ft_destroyer(body.ret);
-			body.content = NULL;
-			body.ret = NULL;
-			return (NULL);
-		}
-		ft_strlcat(body.ret, body.content, ft_searcher(body.content) + 1);
-		ft_put_forward(body.content, ft_searcher(body.content));
-		if (ft_searcher(body.content) == 0)
-		{
-			ft_destroyer(body.content);
-			body.content = NULL;
-		}
-	}
-	if (ft_strlen(body.ret) == 0)
-		body.ret = NULL;
+	else if (read_ret == -1)
+		body.ret = ft_destroyer(&body.content);
+	else if (read_ret == 1)
+		body.ret = ft_destroyer(&body.content);
 	return (body.ret);
 }
